@@ -1,0 +1,29 @@
+# Segredos e variáveis de ambiente
+.env
+.env.*
+!.env.example
+
+# macOS
+.DS_Store
+
+# Node.js
+node_modules/
+frontend/node_modules/
+frontend/dist/
+npm-debug.log*
+
+# .NET
+**/bin/
+**/obj/
+**/TestResults/
+
+# IDEs
+.vs/
+.idea/
+
+# Logs
+*.log
+
+# IA
+.agents/
+.specify/
