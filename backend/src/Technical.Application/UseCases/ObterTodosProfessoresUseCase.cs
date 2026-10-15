@@ -25,8 +25,8 @@ public class ObterTodosProfessoresUseCase : IObterTodosProfessoresUseCase
                 Id = p.Id,
                 Nome = p.Nome,
                 Idiomas = p.Idiomas,
-                QuantidadeAulasNaSemana = p.AulasMarcadas.Count,
-                HorariosDisponiveis = p.Disponibilidade
+                AulasNaSemana = p.AulasMarcadas.Count,
+                Horarios = p.Disponibilidade
                     .Select(d => d.Inicio.ToString("HH:mm"))
                     .Distinct()
                     .OrderBy(h => h)

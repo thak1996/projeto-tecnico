@@ -1,3 +1,4 @@
+using System.Globalization;
 using Technical.Application.DTOs;
 
 namespace Technical.Application.Validators;
@@ -37,13 +38,17 @@ public static class BuscaProfessoresRequestValidator
             }
         }
 
-        var inicioValido = TimeOnly.TryParse(request.InicioFaixa, out var inicio);
+        TimeOnly inicio = default;
+        var inicioValido = !string.IsNullOrWhiteSpace(request.InicioFaixa) &&
+            TimeOnly.TryParseExact(request.InicioFaixa.Trim(), "HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out inicio);
         if (!inicioValido)
         {
             errors["inicioFaixa"] = new[] { "Horário de início da faixa deve estar no formato HH:mm válido." };
         }
 
-        var fimValido = TimeOnly.TryParse(request.FimFaixa, out var fim);
+        TimeOnly fim = default;
+        var fimValido = !string.IsNullOrWhiteSpace(request.FimFaixa) &&
+            TimeOnly.TryParseExact(request.FimFaixa.Trim(), "HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out fim);
         if (!fimValido)
         {
             errors["fimFaixa"] = new[] { "Horário de término da faixa deve estar no formato HH:mm válido." };

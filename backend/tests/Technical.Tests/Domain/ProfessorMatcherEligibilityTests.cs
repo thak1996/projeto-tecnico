@@ -178,4 +178,56 @@ public class ProfessorMatcherEligibilityTests
         Assert.Equal("Zulmira", resultado.Elegiveis[2].Professor.Nome);
         Assert.Equal(2, resultado.Elegiveis[2].QuantidadeAulasNaSemana);
     }
+
+    [Fact]
+    public void Avaliar_ContagemTotalSemanal_ConsideraAulasEmDiasNaoSelecionadosNaBuscaParaOrdenacao()
+    {
+        // profAna: 1 aula na segunda (dia da busca) -> Total 1 aula na semana
+        var profAna = new Professor
+        {
+            Id = 1,
+            Nome = "Ana",
+            Idiomas = new[] { "Inglês" },
+            AgendaBloqueada = false,
+            Disponibilidade = new[] { new Disponibilidade("segunda", new TimeOnly(18, 0), new TimeOnly(22, 0)) },
+            AulasMarcadas = new[]
+            {
+                new AulaMarcada("segunda", new TimeOnly(18, 0), 60)
+            }
+        };
+
+        // profBruno: 0 aulas na segunda, mas 2 aulas em terça e quinta (dias fora da busca) -> Total 2 aulas na semana
+        var profBruno = new Professor
+        {
+            Id = 2,
+            Nome = "Bruno",
+            Idiomas = new[] { "Inglês" },
+            AgendaBloqueada = false,
+            Disponibilidade = new[] { new Disponibilidade("segunda", new TimeOnly(18, 0), new TimeOnly(22, 0)) },
+            AulasMarcadas = new[]
+            {
+                new AulaMarcada("terca", new TimeOnly(18, 0), 60),
+                new AulaMarcada("quinta", new TimeOnly(18, 0), 60)
+            }
+        };
+
+        var criterio = new CriterioBusca(
+            idioma: "Inglês",
+            dias: new[] { "segunda" },
+            inicioFaixa: new TimeOnly(19, 0),
+            fimFaixa: new TimeOnly(21, 0),
+            duracaoMinutos: 60
+        );
+
+        var resultado = _matcher.Avaliar(new[] { profBruno, profAna }, criterio);
+
+        Assert.Equal(2, resultado.Elegiveis.Count);
+        // Ana possui 1 aula no total da semana; Bruno possui 2 aulas no total da semana.
+        // Ana deve ser ranqueada antes de Bruno, pois tem menor total de aulas na semana.
+        Assert.Equal("Ana", resultado.Elegiveis[0].Professor.Nome);
+        Assert.Equal(1, resultado.Elegiveis[0].QuantidadeAulasNaSemana);
+
+        Assert.Equal("Bruno", resultado.Elegiveis[1].Professor.Nome);
+        Assert.Equal(2, resultado.Elegiveis[1].QuantidadeAulasNaSemana);
+    }
 }

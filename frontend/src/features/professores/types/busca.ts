@@ -60,3 +60,21 @@ export interface ProblemDetailsError {
   detail?: string;
   errors?: Record<string, string[]>;
 }
+
+export interface RawProfessorDto {
+  id: number;
+  nome: string;
+  idiomas: string[];
+  aulasNaSemana?: number;
+  quantidadeAulasNaSemana?: number;
+  horarios?: string[];
+  horariosDisponiveis?: string[];
+  disponibilidade?: DisponibilidadeItem[];
+  aulasMarcadas?: AulaMarcadaItem[];
+}
+
+export interface RawBuscaProfessoresResponse {
+  professores?: RawProfessorDto[];
+  elegiveis?: RawProfessorDto[];
+  naoElegiveis?: ProfessorInelegivel[];
+}

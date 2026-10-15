@@ -39,9 +39,8 @@ public class ProfessorMatcher
                 continue;
             }
 
-            // Elegível
-            var quantidadeAulas = professor.AulasMarcadas
-                .Count(a => diasNormalizados.Contains(NormalizarTexto(a.Dia)));
+            // Elegível: total de aulas marcadas do professor em toda a semana
+            var quantidadeAulas = professor.AulasMarcadas.Count;
 
             elegiveis.Add(new ProfessorElegivelResultado(
                 professor,

@@ -18,12 +18,12 @@ public class BuscarProfessoresUseCase : IBuscarProfessoresUseCase
 
     public async Task<BuscaProfessoresResponse> ExecutarAsync(BuscaProfessoresRequest request, CancellationToken cancellationToken = default)
     {
-        if (!TimeOnly.TryParse(request.InicioFaixa, out var inicioFaixa))
+        if (!TimeOnly.TryParseExact(request.InicioFaixa, "HH:mm", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out var inicioFaixa))
         {
             throw new ArgumentException("Horário de início da faixa inválido.", nameof(request.InicioFaixa));
         }
 
-        if (!TimeOnly.TryParse(request.FimFaixa, out var fimFaixa))
+        if (!TimeOnly.TryParseExact(request.FimFaixa, "HH:mm", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out var fimFaixa))
         {
             throw new ArgumentException("Horário de término da faixa inválido.", nameof(request.FimFaixa));
         }
@@ -45,8 +45,8 @@ public class BuscarProfessoresUseCase : IBuscarProfessoresUseCase
                 Id = e.Professor.Id,
                 Nome = e.Professor.Nome,
                 Idiomas = e.Professor.Idiomas,
-                QuantidadeAulasNaSemana = e.QuantidadeAulasNaSemana,
-                HorariosDisponiveis = e.HorariosDisponiveis,
+                AulasNaSemana = e.QuantidadeAulasNaSemana,
+                Horarios = e.HorariosDisponiveis,
                 Disponibilidade = e.Professor.Disponibilidade.Select(d => new DisponibilidadeItemDto
                 {
                     Dia = d.Dia,

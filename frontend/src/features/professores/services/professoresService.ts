@@ -3,6 +3,8 @@ import type {
   BuscaProfessoresResultado,
   ProblemDetailsError,
   ProfessorElegivel,
+  RawBuscaProfessoresResponse,
+  RawProfessorDto,
 } from "../types/busca";
 
 export class ApiError extends Error {
@@ -17,9 +19,9 @@ export class ApiError extends Error {
   }
 }
 
-export function normalizarResultado(data: any): BuscaProfessoresResultado {
-  const lista: any[] = data.professores ?? data.elegiveis ?? [];
-  const elegiveis: ProfessorElegivel[] = lista.map((p: any) => {
+export function normalizarResultado(data: RawBuscaProfessoresResponse): BuscaProfessoresResultado {
+  const lista: RawProfessorDto[] = data.professores ?? data.elegiveis ?? [];
+  const elegiveis: ProfessorElegivel[] = lista.map((p: RawProfessorDto) => {
     const aulas = p.aulasNaSemana ?? p.quantidadeAulasNaSemana ?? 0;
     const horarios = p.horarios ?? p.horariosDisponiveis ?? [];
     return {
@@ -33,7 +35,7 @@ export function normalizarResultado(data: any): BuscaProfessoresResultado {
 
   return {
     ...data,
-    professores: data.professores ?? elegiveis,
+    professores: elegiveis,
     elegiveis,
     naoElegiveis: data.naoElegiveis ?? [],
   };
@@ -71,7 +73,7 @@ export async function buscarProfessores(
     throw new ApiError(errorMessage, response.status, problemDetails);
   }
 
-  const data = await response.json();
+  const data = (await response.json()) as RawBuscaProfessoresResponse;
   return normalizarResultado(data);
 }
 
@@ -99,6 +101,6 @@ export async function obterTodosProfessores(): Promise<BuscaProfessoresResultado
     throw new ApiError(errorMessage, response.status, problemDetails);
   }
 
-  const data = await response.json();
+  const data = (await response.json()) as RawBuscaProfessoresResponse;
   return normalizarResultado(data);
 }
