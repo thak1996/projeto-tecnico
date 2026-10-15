@@ -27,3 +27,4 @@ npm-debug.log*
 # IA
 .agents/
 .specify/
+specs/
