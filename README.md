@@ -22,7 +22,6 @@ O projeto integra uma interface web com uma API REST, mantendo a lógica de neg�
 ### Infraestrutura
 - Docker
 - Docker Compose (`docker-compose.yaml`)
-- PostgreSQL disponível no ambiente de desenvolvimento (serviço de banco configurado no scaffold Docker do projeto)
 
 ## Arquitetura
 
@@ -125,7 +124,7 @@ cd projeto-tecnico
 
 ### 2. Configurar as variáveis de ambiente
 
-Crie o arquivo `.env` a partir do modelo `.env.example` para que as variáveis do Docker Compose e do PostgreSQL sejam carregadas adequadamente:
+Crie o arquivo `.env` a partir do modelo `.env.example` para configurar as portas e variáveis de ambiente dos serviços web e de API no Docker Compose:
 
 ```bash
 cp .env.example .env
@@ -213,7 +212,7 @@ Retorna todos os professores cadastrados e suas disponibilidades semanais comple
 
 Os dados dos professores são carregados a partir do arquivo JSON localizado em `backend/data/professores.json` e permanecem em memória durante a execução da aplicação, atendendo diretamente à especificação do desafio técnico.
 
-A camada de infraestrutura (`JsonProfessorRepository`) é responsável pela leitura, desserialização com suporte a horários flexíveis (`TimeOnlyJsonConverter`) e injeção assíncrona, enquanto as regras de negócio de elegibilidade (`ProfessorMatcher`) permanecem desacopladas e puras na camada de domínio. O container do PostgreSQL (`db`) fornecido no `docker-compose.yaml` faz parte da infraestrutura de scaffold do projeto e opera de forma isolada, não sendo acoplado à consulta de professores.
+A camada de infraestrutura (`JsonProfessorRepository`) é responsável pela leitura, desserialização com suporte a horários flexíveis (`TimeOnlyJsonConverter`) e injeção assíncrona, enquanto as regras de negócio de elegibilidade (`ProfessorMatcher`) permanecem desacopladas e puras na camada de domínio. Não há uso de banco de dados relacional ou serviços externos de armazenamento: a aplicação opera de forma 100% autônoma e resiliente em memória.
 
 ## Testes automatizados
 
@@ -274,7 +273,7 @@ Em conformidade com a instrução do desafio técnico de registrar formalmente a
 Todos os requisitos funcionais e não-funcionais estabelecidos no enunciado do desafio técnico foram integralmente implementados e validados por suítes de testes automatizados. O projeto opera com as seguintes premissas e características de escopo:
 
 - **Conformidade de Escopo**: Todos os critérios de busca (idioma, múltiplos dias, faixa horária, duração), regras de negócio (inícios em `:00`/`:30`, intervalos semiabertos de aulas consecutivas, precedência estrita dos 3 motivos canônicos de inelegibilidade, ordenação por menor número total de aulas marcadas na semana com desempate alfabético), validação defensiva de amplitude mínima, testes automatizados e responsividade mobile foram plenamente atendidos, sem pendências funcionais.
-- **Persistência em Memória (Catálogo Estático)**: Conforme especificado na Constituição do projeto e no enunciado do desafio, o catálogo de professores é alimentado exclusivamente a partir do arquivo JSON estático (`backend/data/professores.json`). Não há persistência de gravação nem operações de cadastro/mutação de dados em banco relacional, uma vez que o desafio se restringe à consulta e cálculo de elegibilidade. O serviço PostgreSQL presente no Compose é mantido exclusivamente como scaffolding de infraestrutura.
+- **Persistência em Memória (Catálogo Estático)**: Conforme especificado na Constituição do projeto e no enunciado do desafio, o catálogo de professores é alimentado exclusivamente a partir do arquivo JSON estático (`backend/data/professores.json`). Não há persistência de gravação nem operações de cadastro/mutação de dados em banco relacional, uma vez que o desafio se restringe à consulta e cálculo de elegibilidade. Todos os serviços e configurações de banco de dados foram totalmente expurgados da orquestração de containers e do ecossistema do projeto.
 - **Abstração de Grade Recorrente Semanal**: O modelo de disponibilidade e agendamento baseia-se nos dias da semana (`segunda` a `domingo`). O sistema não processa datas gregorianas de calendário civil nem controle de feriados ou exceções pontuais, refletindo diretamente o domínio proposto pelo desafio.
 - **Execução Local Fora de Containers**: Para executar o projeto fora do Docker Compose, o ambiente hospedeiro requer a instalação prévia do SDK do .NET 8 (ou superior com roll forward configurado) e do Node.js 20+ (com npm).
 

@@ -104,7 +104,20 @@ Este documento registra a utilização de ferramentas de inteligência artificia
       2. O serviço de frontend `professoresService.ts` foi enriquecido para normalizar transparentemente tanto payloads literais do desafio quanto payloads legados.
       3. Redação formal da seção 4 deste documento detalhando o erro na contagem de aulas semanais e na validação permissiva de horário, acompanhada da evidência empírica do caso Bruno vs Ana no catálogo `professores.json`.
       4. Substituição do placeholder de limitações do `README.md` por declaração conclusiva de conformidade total, arquitetura estática em memória e ciclo semanal recorrente.
-      5. Renomeação do arquivo de orquestração para `docker-compose.yaml` com alinhamento textual completo em toda a documentação.
+13. **Qualidade de Código, Tipagem Estrita e Zero Warnings no Frontend (Feature 007)**:
+    - *Desafio*: Erradicação de inconsistências de tipagem, dependências de useEffect e warnings de compilação/lint no frontend React 19.
+    - *Solução revisada*: Resolução integral de dependências de hooks conforme React 19, refatoração de tipagens para TypeScript estrito e garantia de execução do script `npm run lint` com 0 erros e 0 warnings.
+14. **Seleção Precisa e Acúmulo de Horários na Grade Semanal (Feature 008)**:
+    - *Desafio*: Isolamento da seleção de horários por dia da semana para evitar que a seleção de um slot em determinado dia ativasse indevidamente o mesmo horário em outros dias, além de suportar a seleção múltipla de slots com cálculo reativo do total de aulas e horas agendadas.
+    - *Solução revisada*: Tipagem de slots identificados por chave composta `{ dia, horario }`, permitindo marcação e desmarcação individual por dia, acompanhada de sumário visual reativo com chips de remoção e totalizador de agendamentos.
+15. **Remoção de Configurações e Dependências de Banco de Dados (Feature 009)**:
+    - *Desafio*: O usuário solicitou a remoção de tudo o que fosse relacionado a banco de dados, já que o desafio opera exclusivamente sobre o catálogo em memória `professores.json`. A presença do serviço `db` (PostgreSQL 17-alpine) no Docker Compose criava acoplamento desnecessário, atrasava a inicialização da API aguardando sondas de saúde do banco (`pg_isready`), exigia credenciais em `.env.example`/`.env` e gerava contradições entre documentação e arquitetura real.
+    - *Solução revisada*:
+      1. Exclusão física do serviço `db`, da porta 5432, do volume `postgres_data` e do respectivo healthcheck em `docker-compose.yaml`.
+      2. Remoção da cláusula `depends_on: db: condition: service_healthy` e da variável `ConnectionStrings__DefaultConnection` do serviço `api`, tornando sua subida instantânea e independente.
+      3. Expurgamento das variáveis `POSTGRES_DB`, `POSTGRES_USER` e `POSTGRES_PASSWORD` nos arquivos `.env.example` e `.env`.
+      4. Alinhamento textual do `README.md` (remoção de PostgreSQL dos pré-requisitos, das instruções de execução e das notas de dados/persistência), consagrando a arquitetura autônoma em memória.
+      5. Validação estrutural do Compose (`docker compose config`) e execução com sucesso de 100% dos testes da aplicação (37 no back-end e 34 no front-end) e verificação do linter.
 
 ---
 
