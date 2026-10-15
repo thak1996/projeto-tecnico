@@ -9,6 +9,11 @@ export type DiaSemana =
 
 export type DuracaoAula = 30 | 60 | 90;
 
+export interface HorarioAgendado {
+  dia: DiaSemana;
+  horario: string;
+}
+
 export interface BuscaProfessoresFiltros {
   idioma: string;
   dias: DiaSemana[];

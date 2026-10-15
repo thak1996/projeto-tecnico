@@ -73,4 +73,52 @@ describe("ListaResultadosProfessores - Estados Visuais", () => {
     expect(screen.getByText(/Professores Não Disponíveis \(1\)/i)).toBeInTheDocument();
     expect(screen.getByText("Carla")).toBeInTheDocument();
   });
+
+  it("deve resetar a seleção de horários ao trocar de professor", () => {
+    const profAna = {
+      id: 1,
+      nome: "Ana",
+      idiomas: ["Inglês"],
+      quantidadeAulasNaSemana: 1,
+      horariosDisponiveis: ["18:00"],
+      disponibilidade: [{ dia: "segunda", inicio: "18:00", fim: "22:00" }],
+    };
+    const profBruno = {
+      id: 2,
+      nome: "Bruno",
+      idiomas: ["Inglês"],
+      quantidadeAulasNaSemana: 2,
+      horariosDisponiveis: ["20:00"],
+      disponibilidade: [{ dia: "segunda", inicio: "18:00", fim: "22:00" }],
+    };
+
+    render(
+      <ListaResultadosProfessores
+        resultado={{
+          elegiveis: [profAna, profBruno],
+          naoElegiveis: [],
+        }}
+        isLoading={false}
+        erro={null}
+        diasPesquisados={["segunda"]}
+      />
+    );
+
+    // Ana está ativa por padrão. Seleciona 18:00
+    const btn18 = screen.getByRole("button", { name: /18:00/i });
+    fireEvent.click(btn18);
+
+    // Verifica que 18:00 está selecionado
+    expect(screen.getByText(/Horário Selecionado: 18:00 com Ana/i)).toBeInTheDocument();
+
+    // Clica no card de Bruno
+    const cardBruno = screen.getByText("Bruno").closest(".cursor-pointer");
+    expect(cardBruno).not.toBeNull();
+    fireEvent.click(cardBruno!);
+
+    // Agora a grade exibe Bruno e a seleção de horários foi resetada
+    expect(screen.getByText(/Grade Semanal de Bruno/i)).toBeInTheDocument();
+    expect(screen.queryByText(/Horário Selecionado: 18:00/i)).not.toBeInTheDocument();
+    expect(screen.getByText(/Nenhum horário selecionado/i)).toBeInTheDocument();
+  });
 });

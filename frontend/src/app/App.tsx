@@ -136,6 +136,7 @@ function App() {
             erro={buscaErro}
             modoCatalogoGeral={modoCatalogoGeral}
             diasPesquisados={modoCatalogoGeral ? [] : (ultimosFiltros?.dias ?? [])}
+            duracaoAulaMinutos={ultimosFiltros?.duracaoMinutos ?? 60}
             onTentarNovamente={
               modoCatalogoGeral
                 ? () => void handleLimparBusca()

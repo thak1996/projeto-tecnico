@@ -6,13 +6,14 @@ import { Badge } from "@/components/ui/badge";
 import { CardProfessorElegivel } from "./CardProfessorElegivel";
 import { CardProfessorInelegivel } from "./CardProfessorInelegivel";
 import { GradeSemanalProfessor } from "./GradeSemanalProfessor";
-import type { BuscaProfessoresResultado, DiaSemana } from "../types/busca";
+import type { BuscaProfessoresResultado, DiaSemana, HorarioAgendado } from "../types/busca";
 
-interface ListaResultadosProfessoresProps {
+export interface ListaResultadosProfessoresProps {
   resultado: BuscaProfessoresResultado | null;
   isLoading: boolean;
   erro: string | null;
   diasPesquisados?: DiaSemana[];
+  duracaoAulaMinutos?: number;
   modoCatalogoGeral?: boolean;
   onTentarNovamente?: () => void;
 }
@@ -22,11 +23,40 @@ export const ListaResultadosProfessores: React.FC<ListaResultadosProfessoresProp
   isLoading,
   erro,
   diasPesquisados = ["segunda", "quarta"],
+  duracaoAulaMinutos = 60,
   modoCatalogoGeral = false,
   onTentarNovamente,
 }) => {
   const [professorSelecionadoId, setProfessorSelecionadoId] = useState<number | null>(null);
-  const [horarioSelecionado, setHorarioSelecionado] = useState<string | null>(null);
+  const [horariosSelecionados, setHorariosSelecionados] = useState<HorarioAgendado[]>([]);
+
+  // Ajusta o estado de seleção durante a renderização quando o resultado mudar (padrão React 19 sem effect cascata)
+  const [prevResultado, setPrevResultado] = useState(resultado);
+  if (resultado !== prevResultado) {
+    setPrevResultado(resultado);
+    setHorariosSelecionados([]);
+    setProfessorSelecionadoId(null);
+  }
+
+  const handleToggleHorario = (dia: DiaSemana, horario: string) => {
+    setHorariosSelecionados((prev) => {
+      const exists = prev.some((s) => s.dia === dia && s.horario === horario);
+      if (exists) {
+        return prev.filter((s) => !(s.dia === dia && s.horario === horario));
+      }
+      return [...prev, { dia, horario }];
+    });
+  };
+
+  const handleRemoverHorario = (dia: DiaSemana, horario: string) => {
+    setHorariosSelecionados((prev) =>
+      prev.filter((s) => !(s.dia === dia && s.horario === horario))
+    );
+  };
+
+  const handleLimparHorarios = () => {
+    setHorariosSelecionados([]);
+  };
 
   if (isLoading) {
     return (
@@ -151,7 +181,7 @@ export const ListaResultadosProfessores: React.FC<ListaResultadosProfessoresProp
                   isSelected={professorAtivo?.id === prof.id}
                   onSelect={() => {
                     setProfessorSelecionadoId(prof.id);
-                    setHorarioSelecionado(null);
+                    setHorariosSelecionados([]);
                   }}
                 />
               ))}
@@ -163,8 +193,11 @@ export const ListaResultadosProfessores: React.FC<ListaResultadosProfessoresProp
                 <GradeSemanalProfessor
                   professor={professorAtivo}
                   diasPesquisados={diasAtivos}
-                  horarioSelecionado={horarioSelecionado}
-                  onSelectHorario={(horario) => setHorarioSelecionado(horario)}
+                  horariosSelecionados={horariosSelecionados}
+                  duracaoAulaMinutos={duracaoAulaMinutos}
+                  onToggleHorario={handleToggleHorario}
+                  onRemoverHorario={handleRemoverHorario}
+                  onLimparHorarios={handleLimparHorarios}
                 />
               </div>
             )}

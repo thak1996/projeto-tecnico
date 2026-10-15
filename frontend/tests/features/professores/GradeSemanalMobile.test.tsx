@@ -53,4 +53,25 @@ describe("GradeSemanalProfessor - Responsividade Mobile", () => {
     expect(containerResumo?.className).toContain("flex-col");
     expect(containerResumo?.className).toContain("sm:flex-row");
   });
+
+  it("deve conter classes flex-col e sm:flex-row e quebra fluida na caixa de resumo com múltiplos horários selecionados", () => {
+    const onToggle = vi.fn();
+    render(
+      <GradeSemanalProfessor
+        professor={mockProfessor}
+        diasPesquisados={["segunda", "quarta"]}
+        horariosSelecionados={[
+          { dia: "segunda", horario: "20:00" },
+          { dia: "quarta", horario: "20:00" },
+        ]}
+        onToggleHorario={onToggle}
+      />
+    );
+
+    const textoResumo = screen.getByText(/horários selecionados \(2 aulas\) com bruno silva/i);
+    const containerResumo = textoResumo.closest(".rounded-lg.border");
+    expect(containerResumo).not.toBeNull();
+    expect(containerResumo?.className).toContain("flex-col");
+    expect(containerResumo?.className).toContain("sm:flex-row");
+  });
 });
